@@ -24,7 +24,6 @@ export default function MatchCode() {
     travel_miles: '25',
     interests: [],
     vibe: '',
-    budget: 'medium',
     notes: '',
     has_car: null,
   })
@@ -61,7 +60,6 @@ export default function MatchCode() {
       travel_miles: form.travel_miles,
       interests: form.interests,
       vibe: form.vibe,
-      budget: form.budget,
       notes: form.notes,
       has_car: form.has_car,
     })
@@ -192,27 +190,6 @@ export default function MatchCode() {
                   }`}
                 >
                   {v}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Budget */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Budget</label>
-            <div className="flex gap-2">
-              {['low', 'medium', 'high'].map(b => (
-                <button
-                  key={b}
-                  type="button"
-                  onClick={() => setForm(f => ({ ...f, budget: b }))}
-                  className={`flex-1 py-1.5 rounded-lg text-xs font-medium border capitalize transition-colors ${
-                    form.budget === b
-                      ? 'bg-rose-500 text-white border-rose-500'
-                      : 'bg-white text-gray-600 border-gray-200 hover:border-rose-300'
-                  }`}
-                >
-                  {b === 'low' ? '$ Low' : b === 'medium' ? '$$ Medium' : '$$$ High'}
                 </button>
               ))}
             </div>

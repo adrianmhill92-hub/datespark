@@ -14,6 +14,7 @@ export default function Results() {
     date: searchParams.get('date'),
     startTime: searchParams.get('start'),
     endTime: searchParams.get('end'),
+    budget: searchParams.get('budget') || 'medium',
   }
 
   const { profile: profileA, loading: loadingA, error: errorA } = useProfile(codeA)

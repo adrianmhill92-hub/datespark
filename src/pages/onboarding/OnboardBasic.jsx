@@ -22,6 +22,7 @@ export default function OnboardBasic() {
     name: '',
     email: '',
     password: '',
+    confirmPassword: '',
     phone: '',
     age: '',
     city: prefill?.city || '',
@@ -29,7 +30,6 @@ export default function OnboardBasic() {
     travel_miles: prefill?.travel_miles || '25',
     interests: prefill?.interests || [],
     vibe: prefill?.vibe || '',
-    budget: prefill?.budget || 'medium',
     has_car: null,
     context: '',
   })
@@ -47,6 +47,10 @@ export default function OnboardBasic() {
     e.preventDefault()
     if (!form.name || !form.email || !form.password || !form.city || form.interests.length === 0 || !form.vibe) {
       setError('Please fill in all required fields.')
+      return
+    }
+    if (form.password !== form.confirmPassword) {
+      setError('Passwords do not match.')
       return
     }
 
@@ -73,7 +77,6 @@ export default function OnboardBasic() {
       travel_miles: form.travel_miles,
       interests: form.interests,
       vibe: [form.vibe],
-      budget: form.budget,
       has_car: form.has_car,
       notes: form.context || null,
       is_guest: false,
@@ -110,17 +113,24 @@ export default function OnboardBasic() {
             </div>
           </div>
 
-          {/* Email + Password */}
+          {/* Email */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Email *</label>
+            <input type="email" value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
+              placeholder="you@example.com" className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-rose-300" />
+          </div>
+
+          {/* Password + Confirm Password */}
           <div className="flex gap-3">
-            <div className="flex-1">
-              <label className="block text-sm font-medium text-gray-700 mb-1">Email *</label>
-              <input type="email" value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
-                placeholder="you@example.com" className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-rose-300" />
-            </div>
             <div className="flex-1">
               <label className="block text-sm font-medium text-gray-700 mb-1">Password *</label>
               <input type="password" value={form.password} onChange={e => setForm(f => ({ ...f, password: e.target.value }))}
                 placeholder="8+ characters" className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-rose-300" />
+            </div>
+            <div className="flex-1">
+              <label className="block text-sm font-medium text-gray-700 mb-1">Confirm password *</label>
+              <input type="password" value={form.confirmPassword} onChange={e => setForm(f => ({ ...f, confirmPassword: e.target.value }))}
+                placeholder="Re-enter password" className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-rose-300" />
             </div>
           </div>
 
@@ -185,21 +195,6 @@ export default function OnboardBasic() {
                   className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${
                     form.vibe === v ? 'bg-pink-500 text-white border-pink-500' : 'bg-white text-gray-600 border-gray-200 hover:border-pink-300'
                   }`}>{v}</button>
-              ))}
-            </div>
-          </div>
-
-          {/* Budget */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Budget</label>
-            <div className="flex gap-2">
-              {['low', 'medium', 'high'].map(b => (
-                <button key={b} type="button" onClick={() => setForm(f => ({ ...f, budget: b }))}
-                  className={`flex-1 py-1.5 rounded-lg text-xs font-medium border capitalize transition-colors ${
-                    form.budget === b ? 'bg-rose-500 text-white border-rose-500' : 'bg-white text-gray-600 border-gray-200 hover:border-rose-300'
-                  }`}>
-                  {b === 'low' ? '$ Low' : b === 'medium' ? '$$ Medium' : '$$$ High'}
-                </button>
               ))}
             </div>
           </div>

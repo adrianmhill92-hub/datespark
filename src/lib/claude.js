@@ -76,7 +76,6 @@ Person A:
 - Willing to travel: ${a.travel_miles === 'any' ? 'any distance' : `up to ${a.travel_miles} miles`}
 - Interests: ${a.interests?.join(', ')}
 - Preferred vibe: ${a.vibe}
-- Budget: ${a.budget}
 - Notes: ${a.notes || 'none'}
 
 Person B:
@@ -86,10 +85,10 @@ Person B:
 - Willing to travel: ${b.travel_miles === 'any' ? 'any distance' : `up to ${b.travel_miles} miles`}
 - Interests: ${b.interests?.join(', ')}
 - Preferred vibe: ${b.vibe}
-- Budget: ${b.budget}
 - Notes: ${b.notes || 'none'}
 
-${timingBlock ? `${timingBlock}\n` : ''}${eventsBlock ? `\n${eventsBlock}\n` : ''}
+Budget for this date: ${timing?.budget || 'medium'}
+${timingBlock ? `\n${timingBlock}\n` : ''}${eventsBlock ? `\n${eventsBlock}\n` : ''}
 Generate exactly 5 ranked date activity suggestions tailored to both profiles. Find common interests and complementary preferences. Suggest only activities reachable within the smaller of the two travel distances. Prioritize activities that work in their city.${timingBlock ? ' Suggest only activities that fit within the available time window and suit the time of day (e.g. brunch spots for morning, dinner and shows for evening, bars and live music for late night).' : ''}${eventsBlock ? ' Incorporate 2-3 of the real local events above if they genuinely suit both people\'s interests and budget — rank them naturally among the 5. For each real event: use its exact name as the title, set "source" to "ticketmaster", and set "url" to its Ticketmaster URL. For all AI-generated suggestions set "source" to "ai" and "url" to null.' : ''}
 
 Respond ONLY with a valid JSON array (no markdown, no extra text) in this format:

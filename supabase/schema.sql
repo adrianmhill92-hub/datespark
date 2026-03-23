@@ -7,7 +7,6 @@ create table if not exists profiles (
   city        text not null,
   interests   text[] not null default '{}',
   vibes       text[] not null default '{}',
-  budget      text not null default 'medium',
   zip_code    text,
   travel_miles text not null default '25',
   notes       text,

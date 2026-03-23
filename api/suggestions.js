@@ -12,13 +12,13 @@ export default async function handler(req, res) {
     return res.status(405).json({ message: 'Method not allowed' })
   }
 
-  const { profileA, profileB } = req.body
+  const { profileA, profileB, budget } = req.body
 
   if (!profileA || !profileB) {
     return res.status(400).json({ message: 'Both profiles are required' })
   }
 
-  const prompt = buildPrompt(profileA, profileB)
+  const prompt = buildPrompt(profileA, profileB, budget || 'medium')
 
   try {
     const message = await client.messages.create({
@@ -37,7 +37,7 @@ export default async function handler(req, res) {
   }
 }
 
-function buildPrompt(a, b) {
+function buildPrompt(a, b, budget = 'medium') {
   return `You are a creative date planner. Two people want to go on a date and you need to suggest the best activities for them based on their profiles.
 
 Person A:
@@ -46,7 +46,6 @@ Person A:
 - City: ${a.city}
 - Interests: ${a.interests?.join(', ')}
 - Preferred vibes: ${Array.isArray(a.vibes) ? a.vibes.join(', ') : (a.vibes || 'not specified')}
-- Budget: ${a.budget}
 - Notes: ${a.notes || 'none'}
 
 Person B:
@@ -55,8 +54,9 @@ Person B:
 - City: ${b.city}
 - Interests: ${b.interests?.join(', ')}
 - Preferred vibes: ${Array.isArray(b.vibes) ? b.vibes.join(', ') : (b.vibes || 'not specified')}
-- Budget: ${b.budget}
 - Notes: ${b.notes || 'none'}
+
+Budget for this date: ${budget}
 
 Generate exactly 5 ranked date activity suggestions tailored to both profiles. Find common interests and complementary preferences. Prioritize activities that work in their city.
 

@@ -25,6 +25,7 @@ export default function Schedule() {
   const [date, setDate] = useState(todayISO())
   const [startTime, setStartTime] = useState('19:00')
   const [endTime, setEndTime] = useState('22:00')
+  const [budget, setBudget] = useState('medium')
   const [error, setError] = useState(null)
 
   const duration = computeDuration(startTime, endTime)
@@ -36,7 +37,7 @@ export default function Schedule() {
       return
     }
     navigate(
-      `/results/${codeA}/${codeB}?date=${date}&start=${startTime}&end=${endTime}`
+      `/results/${codeA}/${codeB}?date=${date}&start=${startTime}&end=${endTime}&budget=${budget}`
     )
   }
 
@@ -83,6 +84,27 @@ export default function Schedule() {
                 onChange={e => { setEndTime(e.target.value); setError(null) }}
                 className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-rose-300"
               />
+            </div>
+          </div>
+
+          {/* Budget */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Budget for this date</label>
+            <div className="flex gap-2">
+              {['low', 'medium', 'high'].map(b => (
+                <button
+                  key={b}
+                  type="button"
+                  onClick={() => setBudget(b)}
+                  className={`flex-1 py-1.5 rounded-lg text-xs font-medium border capitalize transition-colors ${
+                    budget === b
+                      ? 'bg-rose-500 text-white border-rose-500'
+                      : 'bg-white text-gray-600 border-gray-200 hover:border-rose-300'
+                  }`}
+                >
+                  {b === 'low' ? '$ Low' : b === 'medium' ? '$$ Medium' : '$$$ High'}
+                </button>
+              ))}
             </div>
           </div>
 
