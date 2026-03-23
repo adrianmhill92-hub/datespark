@@ -13,13 +13,19 @@ const client = new Anthropic({
  * @returns {Promise<Array>} Ranked array of date activity suggestions
  */
 export async function getDateSuggestions(profileA, profileB, timing, events = []) {
-  const message = await client.messages.create({
-    model: 'claude-sonnet-4-6',
-    max_tokens: 4000,
-    messages: [{ role: 'user', content: buildPrompt(profileA, profileB, timing, events) }],
+  const res = await fetch('/api/suggestions', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ profileA, profileB, timing, events }),
   })
 
-  return parseResponse(message.content[0].text)
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}))
+    throw new Error(err.message || 'Failed to fetch suggestions')
+  }
+
+  const { suggestions } = await res.json()
+  return suggestions
 }
 
 function formatTiming(timing) {
