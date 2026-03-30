@@ -1,7 +1,5 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
-import { supabase } from '../../lib/supabase'
-import { generateDateCode } from '../../lib/dateCode'
 import { getGuestSuggestions } from '../../lib/claude'
 
 export default function GuestResults() {
@@ -12,7 +10,6 @@ export default function GuestResults() {
   })()
 
   const [suggestions, setSuggestions] = useState(null)
-  const [guestCode, setGuestCode] = useState(null)
   const [error, setError] = useState(null)
 
   useEffect(() => {
@@ -22,28 +19,12 @@ export default function GuestResults() {
 
   async function load() {
     try {
-      const code = generateDateCode()
-      const { error: dbError } = await supabase.from('profiles').insert({
-        date_code: code,
-        name: 'Guest',
-        city: answers.city,
-        zip_code: answers.zip_code || null,
-        interests: answers.interests,
-        vibe: [answers.vibe],
-        budget: answers.budget,
-        is_guest: true,
-        travel_miles: '25',
-      })
-      if (dbError) throw new Error(dbError.message)
-      setGuestCode(code)
-
       const ideas = await getGuestSuggestions({
         city: answers.city,
-        zip_code: answers.zip_code,
         interests: answers.interests,
         vibe: answers.vibe,
         budget: answers.budget,
-        when: answers.when,
+        group_size: answers.group_size,
       })
       setSuggestions(ideas)
     } catch (err) {
@@ -94,12 +75,10 @@ export default function GuestResults() {
       <div className="max-w-sm mx-auto space-y-4 py-8">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-800">Your date ideas ✨</h1>
-          {guestCode && (
-            <p className="text-xs text-gray-400 mt-1">Guest code: <span className="font-mono font-bold text-rose-500">{guestCode.toUpperCase()}</span></p>
-          )}
         </div>
 
-        {suggestions.map((s, i) => (
+        {/* Unlocked cards — first 2 */}
+        {suggestions.slice(0, 2).map((s, i) => (
           <div key={i} className="bg-white rounded-2xl shadow-sm p-5 space-y-2">
             <div className="flex items-start justify-between gap-2">
               <h3 className="font-bold text-gray-800">{s.title}</h3>
@@ -115,16 +94,40 @@ export default function GuestResults() {
           </div>
         ))}
 
-        {/* Upgrade banner */}
-        <div className="bg-gray-900 rounded-2xl p-5 text-center space-y-3">
-          <p className="text-yellow-400 text-xs font-bold tracking-widest uppercase">Want more?</p>
-          <p className="text-white font-bold">Get 5 ideas + a date personality badge</p>
-          <p className="text-gray-400 text-sm">Create a free account — your answers are already saved.</p>
+        {/* Locked card — 3rd idea */}
+        {suggestions[2] && (
+          <div className="relative">
+            <div className="bg-white rounded-2xl shadow-sm p-5 space-y-2 blur-sm select-none" aria-hidden="true">
+              <div className="flex items-start justify-between gap-2">
+                <h3 className="font-bold text-gray-800">{suggestions[2].title}</h3>
+                <span className="text-xs bg-rose-100 text-rose-600 px-2 py-0.5 rounded-full whitespace-nowrap">{suggestions[2].vibe}</span>
+              </div>
+              <p className="text-gray-600 text-sm leading-relaxed">{suggestions[2].description}</p>
+              <div className="flex gap-3 text-xs text-gray-400">
+                <span>{suggestions[2].budget}</span>
+                <span>·</span>
+                <span>{suggestions[2].duration}</span>
+              </div>
+              <p className="text-xs text-rose-500 italic">{suggestions[2].why}</p>
+            </div>
+            <div className="absolute inset-0 flex flex-col items-center justify-center rounded-2xl bg-white/70 backdrop-blur-sm gap-2">
+              <span className="text-2xl">🔒</span>
+              <span className="text-sm font-semibold text-gray-700">Unlock this idea</span>
+            </div>
+          </div>
+        )}
+
+        {/* CTA */}
+        <div className="bg-rose-500 rounded-2xl p-6 text-center space-y-3">
+          <p className="text-white font-bold text-lg leading-snug">
+            Save your ideas + get your shareable date code
+          </p>
+          <p className="text-rose-100 text-sm">It's free. Your answers are already saved.</p>
           <button
             onClick={handleUpgrade}
-            className="w-full bg-rose-500 hover:bg-rose-600 text-white font-semibold py-2.5 rounded-xl transition-colors"
+            className="w-full bg-white text-rose-500 font-semibold py-2.5 rounded-xl hover:bg-rose-50 transition-colors"
           >
-            Build my full profile →
+            Create free account →
           </button>
         </div>
       </div>

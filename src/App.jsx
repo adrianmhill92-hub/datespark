@@ -16,6 +16,7 @@ import OnboardPersonality from './pages/onboarding/OnboardPersonality'
 
 import GuestQuestions from './pages/guest/GuestQuestions'
 import GuestResults from './pages/guest/GuestResults'
+import EnterCode from './pages/EnterCode'
 
 import SecretPlanner from './pages/planner/SecretPlanner'
 
@@ -36,6 +37,7 @@ export default function App() {
           {/* Path B — guest */}
           <Route path="/guest" element={<GuestQuestions />} />
           <Route path="/guest/results" element={<GuestResults />} />
+          <Route path="/enter-code" element={<EnterCode />} />
 
           {/* Secret Planner — protected */}
           <Route path="/planner" element={<ProtectedRoute><SecretPlanner /></ProtectedRoute>} />

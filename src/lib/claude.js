@@ -138,17 +138,17 @@ Respond ONLY with valid JSON (no markdown): { "badge": "...", "summary": "..." }
 export async function getGuestSuggestions(profile) {
   const message = await client.messages.create({
     model: 'claude-sonnet-4-6',
-    max_tokens: 1500,
+    max_tokens: 2000,
     messages: [{
       role: 'user',
-      content: `You are a creative date planner. Suggest exactly 2 date ideas for this person.
+      content: `You are a creative date planner. Suggest exactly 3 date ideas for this person.
 
 Profile:
-- City: ${profile.city}${profile.zip_code ? `, zip ${profile.zip_code}` : ''}
+- City: ${profile.city}
 - Interests: ${profile.interests?.join(', ')}
-- Vibe: ${profile.vibe}
+- Vibe: ${Array.isArray(profile.vibe) ? profile.vibe.join(', ') : profile.vibe}
 - Budget: ${profile.budget}
-- When: ${profile.when || 'flexible'}
+- Group size: ${profile.group_size || 'just_us'}
 
 Respond ONLY with a valid JSON array (no markdown):
 [{ "title": "...", "description": "2-3 sentences", "budget": "$X–$Y per person", "vibe": "...", "duration": "...", "why": "..." }]`,

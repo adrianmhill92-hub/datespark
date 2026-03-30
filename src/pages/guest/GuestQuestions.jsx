@@ -9,24 +9,34 @@ const INTERESTS = [
 
 const VIBES = ['Chill', 'Adventurous', 'Romantic', 'Playful', 'Cultural', 'Spontaneous']
 
+const BUDGETS = [
+  { key: 'under_20', label: 'Under $20' },
+  { key: '20_50', label: '$20–$50' },
+  { key: '50_100', label: '$50–$100' },
+  { key: '100_plus', label: '$100+' },
+]
+
+const GROUP_SIZES = [
+  { key: 'just_us', label: 'Just us 2' },
+  { key: 'small_group', label: 'Small group (3–5)' },
+  { key: 'big_group', label: 'Big group (6+)' },
+]
+
 export default function GuestQuestions() {
   const navigate = useNavigate()
   const [step, setStep] = useState(0)
   const [answers, setAnswers] = useState({
     city: '',
-    zip_code: '',
     interests: [],
-    vibe: '',
-    budget: 'medium',
-    when: '',
+    vibe: [],
+    budget: 'under_20',
+    group_size: 'just_us',
   })
 
   function canAdvance() {
     if (step === 0) return answers.city.trim().length > 0
-    if (step === 1) return answers.interests.length > 0
-    if (step === 2) return !!answers.vibe
-    if (step === 3) return true
-    if (step === 4) return true
+    if (step === 1) return answers.vibe.length > 0
+    if (step === 2) return answers.interests.length > 0
     return true
   }
 
@@ -43,6 +53,13 @@ export default function GuestQuestions() {
     setAnswers(a => ({
       ...a,
       interests: a.interests.includes(i) ? a.interests.filter(x => x !== i) : [...a.interests, i],
+    }))
+  }
+
+  function toggleVibe(v) {
+    setAnswers(a => ({
+      ...a,
+      vibe: a.vibe.includes(v) ? a.vibe.filter(x => x !== v) : [...a.vibe, v],
     }))
   }
 
@@ -71,46 +88,60 @@ export default function GuestQuestions() {
           </div>
         </div>
 
-        {/* Step 0: City + zip */}
+        {/* Step 0: City */}
         {step === 0 && (
           <div className="space-y-4">
-            <h2 className="text-xl font-bold text-gray-800">Where are you based?</h2>
+            <h2 className="text-xl font-bold text-gray-800">What's your city?</h2>
+            <input
+              type="text"
+              value={answers.city}
+              onChange={e => setAnswers(a => ({ ...a, city: e.target.value }))}
+              placeholder="New York"
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-rose-300"
+            />
+          </div>
+        )}
+
+        {/* Step 1: Vibe (multi-select chips) */}
+        {step === 1 && (
+          <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">City *</label>
-              <input
-                type="text"
-                value={answers.city}
-                onChange={e => setAnswers(a => ({ ...a, city: e.target.value }))}
-                placeholder="New York"
-                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-rose-300"
-              />
+              <h2 className="text-xl font-bold text-gray-800">What's your vibe?</h2>
+              <p className="text-gray-400 text-sm mt-1">Pick all that apply.</p>
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Zip code (optional)</label>
-              <input
-                type="text"
-                value={answers.zip_code}
-                onChange={e => setAnswers(a => ({ ...a, zip_code: e.target.value }))}
-                placeholder="10001"
-                maxLength={10}
-                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-rose-300"
-              />
+            <div className="flex flex-wrap gap-2">
+              {VIBES.map(v => (
+                <button
+                  key={v}
+                  type="button"
+                  onClick={() => toggleVibe(v)}
+                  className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
+                    answers.vibe.includes(v)
+                      ? 'bg-rose-500 text-white border-rose-500'
+                      : 'bg-white text-gray-600 border-gray-200 hover:border-rose-300'
+                  }`}
+                >
+                  {v}
+                </button>
+              ))}
             </div>
           </div>
         )}
 
-        {/* Step 1: Interests */}
-        {step === 1 && (
+        {/* Step 2: Interests */}
+        {step === 2 && (
           <div className="space-y-4">
-            <h2 className="text-xl font-bold text-gray-800">What are you into?</h2>
-            <p className="text-gray-400 text-sm">Pick any that apply.</p>
+            <div>
+              <h2 className="text-xl font-bold text-gray-800">What are you into?</h2>
+              <p className="text-gray-400 text-sm mt-1">Pick any that apply.</p>
+            </div>
             <div className="flex flex-wrap gap-2">
               {INTERESTS.map(i => (
                 <button
                   key={i}
                   type="button"
                   onClick={() => toggleInterest(i)}
-                  className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${
+                  className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
                     answers.interests.includes(i)
                       ? 'bg-rose-500 text-white border-rose-500'
                       : 'bg-white text-gray-600 border-gray-200 hover:border-rose-300'
@@ -123,41 +154,12 @@ export default function GuestQuestions() {
           </div>
         )}
 
-        {/* Step 2: Vibe */}
-        {step === 2 && (
-          <div className="space-y-4">
-            <h2 className="text-xl font-bold text-gray-800">Pick a date vibe.</h2>
-            <div className="flex flex-col gap-2">
-              {VIBES.map(v => (
-                <button
-                  key={v}
-                  type="button"
-                  onClick={() => {
-                    setAnswers(a => ({ ...a, vibe: v }))
-                  }}
-                  className={`w-full py-3 rounded-xl text-sm font-medium border transition-colors ${
-                    answers.vibe === v
-                      ? 'bg-rose-500 text-white border-rose-500'
-                      : 'bg-white text-gray-700 border-gray-200 hover:border-rose-300'
-                  }`}
-                >
-                  {v}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-
         {/* Step 3: Budget */}
         {step === 3 && (
           <div className="space-y-4">
             <h2 className="text-xl font-bold text-gray-800">What's your budget?</h2>
             <div className="flex flex-col gap-2">
-              {[
-                { key: 'low', label: '$ Low — under $30/person' },
-                { key: 'medium', label: '$$ Medium — $30–$75/person' },
-                { key: 'high', label: '$$$ High — $75+/person' },
-              ].map(b => (
+              {BUDGETS.map(b => (
                 <button
                   key={b.key}
                   type="button"
@@ -175,17 +177,26 @@ export default function GuestQuestions() {
           </div>
         )}
 
-        {/* Step 4: When */}
+        {/* Step 4: Group size */}
         {step === 4 && (
           <div className="space-y-4">
-            <h2 className="text-xl font-bold text-gray-800">When is the date?</h2>
-            <p className="text-gray-400 text-sm">Optional — helps tailor the suggestions.</p>
-            <input
-              type="date"
-              value={answers.when}
-              onChange={e => setAnswers(a => ({ ...a, when: e.target.value }))}
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-rose-300"
-            />
+            <h2 className="text-xl font-bold text-gray-800">How many people?</h2>
+            <div className="flex flex-col gap-2">
+              {GROUP_SIZES.map(g => (
+                <button
+                  key={g.key}
+                  type="button"
+                  onClick={() => setAnswers(a => ({ ...a, group_size: g.key }))}
+                  className={`w-full py-3 rounded-xl text-sm font-medium border transition-colors ${
+                    answers.group_size === g.key
+                      ? 'bg-rose-500 text-white border-rose-500'
+                      : 'bg-white text-gray-700 border-gray-200 hover:border-rose-300'
+                  }`}
+                >
+                  {g.label}
+                </button>
+              ))}
+            </div>
           </div>
         )}
 
@@ -194,7 +205,7 @@ export default function GuestQuestions() {
           disabled={!canAdvance()}
           className="mt-6 w-full bg-rose-500 hover:bg-rose-600 disabled:bg-rose-300 text-white font-semibold py-2.5 rounded-xl transition-colors"
         >
-          {step < 4 ? 'Next →' : 'Get my date ideas →'}
+          {step < 4 ? 'Next →' : 'Find my date ideas →'}
         </button>
       </div>
     </div>

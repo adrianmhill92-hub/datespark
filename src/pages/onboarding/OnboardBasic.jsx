@@ -29,7 +29,7 @@ export default function OnboardBasic() {
     zip_code: prefill?.zip_code || '',
     travel_miles: prefill?.travel_miles || '25',
     interests: prefill?.interests || [],
-    vibe: prefill?.vibe || '',
+    vibe: Array.isArray(prefill?.vibe) ? prefill.vibe : (prefill?.vibe ? [prefill.vibe] : []),
     has_car: null,
     context: '',
   })
@@ -43,9 +43,16 @@ export default function OnboardBasic() {
     }))
   }
 
+  function toggleVibe(v) {
+    setForm(f => ({
+      ...f,
+      vibe: f.vibe.includes(v) ? f.vibe.filter(x => x !== v) : [...f.vibe, v],
+    }))
+  }
+
   async function handleSubmit(e) {
     e.preventDefault()
-    if (!form.name || !form.email || !form.password || !form.city || form.interests.length === 0 || !form.vibe) {
+    if (!form.name || !form.email || !form.password || !form.city || form.interests.length === 0 || form.vibe.length === 0) {
       setError('Please fill in all required fields.')
       return
     }
@@ -76,7 +83,7 @@ export default function OnboardBasic() {
       zip_code: form.zip_code || null,
       travel_miles: form.travel_miles,
       interests: form.interests,
-      vibe: [form.vibe],
+      vibe: form.vibe,
       has_car: form.has_car,
       notes: form.context || null,
       is_guest: false,
@@ -191,9 +198,9 @@ export default function OnboardBasic() {
             <div className="flex flex-wrap gap-2">
               {VIBES.map(v => (
                 <button key={v} type="button"
-                  onClick={() => setForm(f => ({ ...f, vibe: v }))}
+                  onClick={() => toggleVibe(v)}
                   className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${
-                    form.vibe === v ? 'bg-pink-500 text-white border-pink-500' : 'bg-white text-gray-600 border-gray-200 hover:border-pink-300'
+                    form.vibe.includes(v) ? 'bg-pink-500 text-white border-pink-500' : 'bg-white text-gray-600 border-gray-200 hover:border-pink-300'
                   }`}>{v}</button>
               ))}
             </div>
