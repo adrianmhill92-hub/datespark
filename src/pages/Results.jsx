@@ -1,7 +1,9 @@
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom'
 import { useProfile } from '../hooks/useProfile'
 import { useSuggestions } from '../hooks/useSuggestions'
+import { useAuth } from '../contexts/AuthContext'
+import { supabase } from '../lib/supabase'
 import SuggestionCard from '../components/SuggestionCard'
 import LoadingSpinner from '../components/LoadingSpinner'
 
@@ -9,6 +11,8 @@ export default function Results() {
   const { codeA, codeB } = useParams()
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
+  const { user } = useAuth()
+  const savedRef = useRef(false)
 
   const timing = {
     date: searchParams.get('date'),
@@ -26,6 +30,21 @@ export default function Results() {
       fetch(profileA, profileB, timing)
     }
   }, [profileA, profileB]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Save date session for the logged-in user (once per results load)
+  useEffect(() => {
+    if (!user || !suggestions.length || !profileA || !profileB || savedRef.current) return
+    const isUserA = profileA.user_id === user.id
+    const isUserB = profileB.user_id === user.id
+    if (!isUserA && !isUserB) return
+    savedRef.current = true
+    const partnerProfile = isUserA ? profileB : profileA
+    supabase.from('date_sessions').insert({
+      user_id: user.id,
+      partner_name: partnerProfile.name,
+      suggestions,
+    })
+  }, [suggestions, user, profileA, profileB])
 
   const isLoading = loadingA || loadingB || loadingSuggestions
   const error = errorA || errorB || suggError
