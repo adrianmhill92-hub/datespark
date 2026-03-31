@@ -12,6 +12,13 @@ const INTERESTS = [
 ]
 const VIBES = ['Chill', 'Adventurous', 'Romantic', 'Playful', 'Cultural', 'Spontaneous']
 
+// Normalize a DB value that may be a string, string[], or null → always string[]
+function toArray(val) {
+  if (!val) return []
+  if (Array.isArray(val)) return val
+  return [val]
+}
+
 const ONBOARD_QUESTIONS = [
   { key: 'q1',  question: 'Describe your ideal date in one sentence.',           type: 'text' },
   { key: 'q2',  question: 'Daytime or nighttime date?',                          type: 'choice', options: ['Daytime', 'Nighttime', 'Either works'] },
@@ -617,7 +624,7 @@ export default function Dashboard() {
           <h3 className="font-semibold text-gray-800">Interests</h3>
           {editInterests === null && (
             <button
-              onClick={() => setEditInterests(profile.interests || [])}
+              onClick={() => setEditInterests(toArray(profile.interests))}
               className="text-xs text-rose-400 hover:text-rose-600"
             >
               Edit
@@ -661,7 +668,7 @@ export default function Dashboard() {
           </div>
         ) : (
           <div className="flex flex-wrap gap-1.5">
-            {(profile.interests || []).map(i => (
+            {toArray(profile.interests).map(i => (
               <span key={i} className="px-2.5 py-1 bg-rose-50 text-rose-600 rounded-full text-xs font-medium">{i}</span>
             ))}
           </div>
@@ -674,7 +681,7 @@ export default function Dashboard() {
           <h3 className="font-semibold text-gray-800">Date vibe</h3>
           {editVibe === null && (
             <button
-              onClick={() => setEditVibe(profile.vibe || [])}
+              onClick={() => setEditVibe(toArray(profile.vibe))}
               className="text-xs text-rose-400 hover:text-rose-600"
             >
               Edit
@@ -718,10 +725,10 @@ export default function Dashboard() {
           </div>
         ) : (
           <div className="flex flex-wrap gap-1.5">
-            {(profile.vibe || []).map(v => (
+            {toArray(profile.vibe).map(v => (
               <span key={v} className="px-2.5 py-1 bg-pink-50 text-pink-600 rounded-full text-xs font-medium">{v}</span>
             ))}
-            {!(profile.vibe || []).length && (
+            {!toArray(profile.vibe).length && (
               <span className="text-gray-400 text-sm">None set</span>
             )}
           </div>
